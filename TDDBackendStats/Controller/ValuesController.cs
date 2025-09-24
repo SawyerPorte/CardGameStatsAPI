@@ -20,7 +20,7 @@ namespace TDDBackendStats.Controller
         // 1. Record a Full Game Run
         // -------------------------
         [HttpPost]
-        public async Task<IActionResult> PostGameStat(GameStat stat)
+        public async Task<IActionResult> PostGameStat([FromBody] GameStat stat)
         {
             if (!ModelState.IsValid)
             {
