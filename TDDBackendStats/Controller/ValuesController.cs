@@ -29,17 +29,11 @@ namespace TDDBackendStats.Controller
                 return BadRequest(new { errors = ModelState });
             }
 
-            try
-            {
-                _context.GameStats.Add(stat);
-                await _context.SaveChangesAsync();
+            
+                //_context.GameStats.Add(stat);
+                //await _context.SaveChangesAsync();
                 return Ok(stat);
-            }
-            catch (Exception ex)
-            {
-                // If it's crashing in EF or serialization, you'll see the message
-                return BadRequest(new { message = ex.Message, stack = ex.StackTrace });
-            }
+           
         }
 
         // -------------------------
