@@ -10,9 +10,9 @@
         public int ExtractionsUsed { get; set; }
         public int DeckSize { get; set; }
         public string EnemyThatKilled { get; set; } = string.Empty;
-        public List<string> RelicsPicked { get; set; } = new List<string>();
-        public List<string> CharmsPicked { get; set; } = new List<string>();
-        public List<string> CardsPicked { get; set; } = new List<string>();
+       //public List<string> RelicsPicked { get; set; } = new List<string>();
+        //public List<string> CharmsPicked { get; set; } = new List<string>();
+        //public List<string> CardsPicked { get; set; } = new List<string>();
     }
 
     public class CardPickStat

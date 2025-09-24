@@ -21,7 +21,7 @@ namespace TDDBackendStats.Controller
         // 1. Record a Full Game Run
         // -------------------------
         [HttpPost]
-        public async Task<IActionResult> PostGameStat([FromBody] GameStat stat)
+        public  IActionResult PostGameStat([FromBody] GameStat stat)
         {
             if (!ModelState.IsValid)
             {
@@ -49,52 +49,52 @@ namespace TDDBackendStats.Controller
         // -------------------------
         // 4. Get Global Card Pick Stats
         // -------------------------
-        [HttpGet("card-picks")]
-        public async Task<IActionResult> GetCardPicks()
-        {
-            var allCards = await _context.GameStats
-                .SelectMany(s => s.CardsPicked)
-                .ToListAsync();
+        //[HttpGet("card-picks")]
+        //public async Task<IActionResult> GetCardPicks()
+        //{
+        //    var allCards = await _context.GameStats
+        //        .SelectMany(s => s.CardsPicked)
+        //        .ToListAsync();
 
-            var cardStats = allCards
-                .GroupBy(c => c)
-                .Select(g => new CardPickStat
-                {
-                    CardName = g.Key,
-                    TimesPicked = g.Count()
-                })
-                .OrderByDescending(c => c.TimesPicked)
-                .ToList();
+        //    var cardStats = allCards
+        //        .GroupBy(c => c)
+        //        .Select(g => new CardPickStat
+        //        {
+        //            CardName = g.Key,
+        //            TimesPicked = g.Count()
+        //        })
+        //        .OrderByDescending(c => c.TimesPicked)
+        //        .ToList();
 
-            return Ok(cardStats);
-        }
+        //    return Ok(cardStats);
+        //}
 
-        // -------------------------
-        // 5. Get Card Picks by Class (with optional win filter)
-        // -------------------------
-        [HttpGet("card-picks/by-class")]
-        public async Task<IActionResult> GetCardPicksByClass(string playerClass, bool? onlyWins = null)
-        {
-            var filteredStats = _context.GameStats
-                .Where(s => s.StartingClass.Equals(playerClass, StringComparison.OrdinalIgnoreCase));
+        //// -------------------------
+        //// 5. Get Card Picks by Class (with optional win filter)
+        //// -------------------------
+        //[HttpGet("card-picks/by-class")]
+        //public async Task<IActionResult> GetCardPicksByClass(string playerClass, bool? onlyWins = null)
+        //{
+        //    var filteredStats = _context.GameStats
+        //        .Where(s => s.StartingClass.Equals(playerClass, StringComparison.OrdinalIgnoreCase));
 
-            if (onlyWins == true)
-            {
-                filteredStats = filteredStats.Where(s => s.Win);
-            }
+        //    if (onlyWins == true)
+        //    {
+        //        filteredStats = filteredStats.Where(s => s.Win);
+        //    }
 
-            var cardStats = await filteredStats
-                .SelectMany(s => s.CardsPicked)
-                .GroupBy(c => c)
-                .Select(g => new CardPickStat
-                {
-                    CardName = g.Key,
-                    TimesPicked = g.Count()
-                })
-                .OrderByDescending(c => c.TimesPicked)
-                .ToListAsync();
+        //    var cardStats = await filteredStats
+        //        .SelectMany(s => s.CardsPicked)
+        //        .GroupBy(c => c)
+        //        .Select(g => new CardPickStat
+        //        {
+        //            CardName = g.Key,
+        //            TimesPicked = g.Count()
+        //        })
+        //        .OrderByDescending(c => c.TimesPicked)
+        //        .ToListAsync();
 
-            return Ok(cardStats);
-        }
+        //    return Ok(cardStats);
+        //}
     }
 }
