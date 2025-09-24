@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CardGameStatsAPI.Data;
 using Microsoft.AspNetCore.Mvc;
-using TDDBackendStats.Models;
+using Microsoft.EntityFrameworkCore;
+//using TDDBackendStats.Models;
 
 namespace TDDBackendStats.Controller
 {
@@ -8,68 +9,64 @@ namespace TDDBackendStats.Controller
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        // Store all game runs in memory
-        private static List<GameStat> _stats = new List<GameStat>();
+        private readonly AppDbContext _context;
 
-        // Store global card pick stats (fast lookup with dictionary)
-        private static Dictionary<string, CardPickStat> _cardStats = new Dictionary<string, CardPickStat>();
-
+        public ValuesController(AppDbContext context)
+        {
+            _context = context;
+        }
 
         // -------------------------
         // 1. Record a Full Game Run
         // -------------------------
         [HttpPost]
-        public IActionResult PostGameStat(GameStat stat)
+        public async Task<IActionResult> PostGameStat(GameStat stat)
         {
-            stat.Id = _stats.Count + 1;
-            _stats.Add(stat);
-
-            // Update global card pick stats from this run
-            foreach (var card in stat.CardsPicked)
-            {
-                if (_cardStats.ContainsKey(card))
-                {
-                    _cardStats[card].TimesPicked++;
-                }
-                else
-                {
-                    _cardStats[card] = new CardPickStat
-                    {
-                        CardName = card,
-                        TimesPicked = 1
-                    };
-                }
-            }
-
+            _context.GameStats.Add(stat);
+            await _context.SaveChangesAsync();  // Save to MySQL
             return Ok(stat);
         }
-
 
         // -------------------------
         // 2. Get All Game Runs
         // -------------------------
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_stats);
+            var stats = await _context.GameStats.ToListAsync();
+            return Ok(stats);
         }
 
         // -------------------------
         // 4. Get Global Card Pick Stats
         // -------------------------
         [HttpGet("card-picks")]
-        public IActionResult GetCardPicks()
+        public async Task<IActionResult> GetCardPicks()
         {
-            return Ok(_cardStats.Values.OrderByDescending(c => c.TimesPicked));
+            var allCards = await _context.GameStats
+                .SelectMany(s => s.CardsPicked)
+                .ToListAsync();
+
+            var cardStats = allCards
+                .GroupBy(c => c)
+                .Select(g => new CardPickStat
+                {
+                    CardName = g.Key,
+                    TimesPicked = g.Count()
+                })
+                .OrderByDescending(c => c.TimesPicked)
+                .ToList();
+
+            return Ok(cardStats);
         }
 
         // -------------------------
         // 5. Get Card Picks by Class (with optional win filter)
         // -------------------------
         [HttpGet("card-picks/by-class")]
-        public IActionResult GetCardPicksByClass(string playerClass, bool? onlyWins = null)
+        public async Task<IActionResult> GetCardPicksByClass(string playerClass, bool? onlyWins = null)
         {
-            var filteredStats = _stats
+            var filteredStats = _context.GameStats
                 .Where(s => s.StartingClass.Equals(playerClass, StringComparison.OrdinalIgnoreCase));
 
             if (onlyWins == true)
@@ -77,7 +74,7 @@ namespace TDDBackendStats.Controller
                 filteredStats = filteredStats.Where(s => s.Win);
             }
 
-            var cardStats = filteredStats
+            var cardStats = await filteredStats
                 .SelectMany(s => s.CardsPicked)
                 .GroupBy(c => c)
                 .Select(g => new CardPickStat
@@ -85,10 +82,10 @@ namespace TDDBackendStats.Controller
                     CardName = g.Key,
                     TimesPicked = g.Count()
                 })
-                .OrderByDescending(c => c.TimesPicked);
+                .OrderByDescending(c => c.TimesPicked)
+                .ToListAsync();
 
             return Ok(cardStats);
         }
-
     }
 }
