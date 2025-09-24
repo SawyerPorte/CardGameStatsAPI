@@ -17,6 +17,7 @@
 
     public class CardPickStat
     {
+        public int Id { get; set; }
         public string CardName { get; set; } = string.Empty;
         public int TimesPicked { get; set; }
     }
