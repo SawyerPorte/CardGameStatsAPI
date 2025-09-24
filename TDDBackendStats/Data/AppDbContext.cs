@@ -14,30 +14,30 @@ namespace CardGameStatsAPI.Data
         public DbSet<GameStat> GameStats { get; set; }
         public DbSet<CardPickStat> CardPickStats { get; set; }
 
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    // Convert List<string> to JSON for storage
-        //    modelBuilder.Entity<GameStat>()
-        //        .Property(g => g.RelicsPicked)
-        //        .HasConversion(
-        //            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-        //            v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)
-        //        );
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Convert List<string> to JSON for storage
+            modelBuilder.Entity<GameStat>()
+                .Property(g => g.RelicsPicked)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)
+                );
 
-        //    modelBuilder.Entity<GameStat>()
-        //        .Property(g => g.CharmsPicked)
-        //        .HasConversion(
-        //            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-        //            v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)
-        //        );
+            modelBuilder.Entity<GameStat>()
+                .Property(g => g.CharmsPicked)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)
+                );
 
-        //    modelBuilder.Entity<GameStat>()
-        //        .Property(g => g.CardsPicked)
-        //        .HasConversion(
-        //            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-        //            v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)
-        //        );
-        //}
+            modelBuilder.Entity<GameStat>()
+                .Property(g => g.CardsPicked)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)
+                );
+        }
     }
 
     //public class GameStat
