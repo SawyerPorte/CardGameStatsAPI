@@ -22,6 +22,12 @@ namespace TDDBackendStats.Controller
         [HttpPost]
         public async Task<IActionResult> PostGameStat(GameStat stat)
         {
+            if (!ModelState.IsValid)
+            {
+                // This will return a 400 with details about what didn’t bind correctly
+                return BadRequest(new { errors = ModelState });
+            }
+
             _context.GameStats.Add(stat);
             await _context.SaveChangesAsync();  // Save to MySQL
             return Ok(stat);
