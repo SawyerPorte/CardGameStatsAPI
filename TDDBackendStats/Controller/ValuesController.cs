@@ -5,8 +5,9 @@ using TDDBackendStats.Models;
 
 namespace TDDBackendStats.Controller
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+
     public class ValuesController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -28,9 +29,17 @@ namespace TDDBackendStats.Controller
                 return BadRequest(new { errors = ModelState });
             }
 
-            _context.GameStats.Add(stat);
-            await _context.SaveChangesAsync();  // Save to MySQL
-            return Ok(stat);
+            try
+            {
+                _context.GameStats.Add(stat);
+                await _context.SaveChangesAsync();
+                return Ok(stat);
+            }
+            catch (Exception ex)
+            {
+                // If it's crashing in EF or serialization, you'll see the message
+                return BadRequest(new { message = ex.Message, stack = ex.StackTrace });
+            }
         }
 
         // -------------------------
