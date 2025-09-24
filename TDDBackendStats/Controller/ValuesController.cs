@@ -1,7 +1,7 @@
 ﻿using CardGameStatsAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-//using TDDBackendStats.Models;
+using TDDBackendStats.Models;
 
 namespace TDDBackendStats.Controller
 {
