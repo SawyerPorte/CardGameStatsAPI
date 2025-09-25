@@ -6,7 +6,7 @@
         public string SteamName { get; set; } = string.Empty;
         public string StartingClass { get; set; } = string.Empty;
         public bool Win { get; set; }
-        public int LayerReached { get; set; }
+        public int DifficultyLevel { get; set; }
         public int ExtractionsUsed { get; set; }
         public int DeckSize { get; set; }
         public string EnemyThatKilled { get; set; } = string.Empty;
