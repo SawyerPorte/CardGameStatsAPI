@@ -13,9 +13,10 @@
         public List<string> RelicsPicked { get; set; } = new List<string>();
         public List<string> CharmsPicked { get; set; } = new List<string>();
         public List<string> CardsPicked { get; set; } = new List<string>();
-        public string TimePlayed { get; set; }
+        public string TimePlayed { get; set; } = string.Empty;
         public int ShopsVisited { get; set; }
         public int EndingScore { get; set; }
+        public string HeroPower { get; set; } = string.Empty;
     }
 
     public class CardPickStat
