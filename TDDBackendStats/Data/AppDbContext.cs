@@ -38,11 +38,7 @@ namespace CardGameStatsAPI.Data
                     v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)
                 );
 
-            modelBuilder.Entity<GameStat>()
-                .Property(g => g.TimePlayed)
-                .HasConversion(
-                    v => v.ToString(@"hh\:mm\:ss"), // store in DB as formatted string
-                    v => TimeSpan.Parse(v)          // convert back when loading
+            
     );
         }
     }
