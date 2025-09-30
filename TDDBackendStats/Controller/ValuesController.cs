@@ -194,16 +194,26 @@ namespace TDDBackendStats.Controller
             var avgDeckSize = allStats.Any() ? allStats.Average(s => s.DeckSize) : 0;
 
             // Average Run Time (assuming TimePlayed is in seconds as string)
-            double avgRunTimeSeconds = 0;
-            var times = allStats
-                .Select(s => double.TryParse(s.TimePlayed, out var t) ? t : (double?)null)
-                .Where(t => t.HasValue)
-                .Select(t => t.Value)
-                .ToList();
-            if (times.Any())
-                avgRunTimeSeconds = times.Average();
-            // format as mm:ss
-            string avgRunTime = TimeSpan.FromSeconds(avgRunTimeSeconds).ToString(@"mm\:ss");
+            var timeSpans = allStats
+            .Select(s =>
+            {
+                bool success = TimeSpan.TryParse(s.TimePlayed, out var ts);
+                return success ? ts : (TimeSpan?)null;
+            })
+            .Where(ts => ts.HasValue)
+            .Select(ts => ts.Value)
+            .ToList();
+
+            // Calculate average TimeSpan
+            TimeSpan avgRunTime = TimeSpan.Zero;
+            if (timeSpans.Any())
+            {
+                long totalTicks = timeSpans.Sum(ts => ts.Ticks);
+                avgRunTime = new TimeSpan(totalTicks / timeSpans.Count);
+            }
+
+            // Format as string (HH:mm:ss)
+            string avgRunTimeStr = avgRunTime.ToString(@"hh\:mm\:ss");
 
             // Highest Score
             var highestScoreEntry = allStats
