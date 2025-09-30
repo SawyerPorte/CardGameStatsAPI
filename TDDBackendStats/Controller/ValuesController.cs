@@ -139,5 +139,61 @@ namespace TDDBackendStats.Controller
                 MostPlayedClass = mostPlayedClass
             });
         }
+
+
+
+        [HttpGet("global-stats")]
+        public async Task<IActionResult> GetGlobalStatsDetailed()
+        {
+            var allStats = await _context.GameStats.ToListAsync();
+
+            if (!allStats.Any())
+                return Ok(new { }); // no data
+
+            // Helper to group and count a list of strings
+            List<object> GroupAndCount(IEnumerable<string> items)
+            {
+                return items
+                    .Where(s => !string.IsNullOrEmpty(s))
+                    .GroupBy(x => x)
+                    .Select(g => new { Name = g.Key, Count = g.Count() })
+                    .OrderByDescending(g => g.Count)
+                    .ToList<object>();
+            }
+
+            // Cards
+            var allCards = allStats.SelectMany(s => s.CardsPicked).ToList();
+            var cardStats = GroupAndCount(allCards);
+
+            // Relics
+            var allRelics = allStats.SelectMany(s => s.RelicsPicked).ToList();
+            var relicStats = GroupAndCount(allRelics);
+
+            // Charms
+            var allCharms = allStats.SelectMany(s => s.CharmsPicked).ToList();
+            var charmStats = GroupAndCount(allCharms);
+
+            // Hero Powers
+            var allHeroPowers = allStats.Select(s => s.HeroPower).Where(h => !string.IsNullOrEmpty(h)).ToList();
+            var heroPowerStats = GroupAndCount(allHeroPowers);
+
+            // Enemies
+            var allEnemies = allStats.Select(s => s.EnemyThatKilled).Where(e => !string.IsNullOrEmpty(e)).ToList();
+            var enemyStats = GroupAndCount(allEnemies);
+
+            // Classes
+            var allClasses = allStats.Select(s => s.StartingClass).Where(c => !string.IsNullOrEmpty(c)).ToList();
+            var classStats = GroupAndCount(allClasses);
+
+            return Ok(new
+            {
+                cards = cardStats,
+                relics = relicStats,
+                charms = charmStats,
+                heroPowers = heroPowerStats,
+                enemies = enemyStats,
+                classes = classStats
+            });
+        }
     }
 }
