@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("https://card-game-stats-front-end.vercel.app/") // replace with your deployed frontend URL
+            policy.WithOrigins("http://localhost:3000","https://card-game-stats-front-end.vercel.app") // replace with your deployed frontend URL
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
