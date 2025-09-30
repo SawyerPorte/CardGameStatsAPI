@@ -96,5 +96,40 @@ namespace TDDBackendStats.Controller
 
             return Ok(cardStats);
         }
+
+        [HttpGet("popular-hero-power")]
+        public async Task<IActionResult> GetPopularHeroPower()
+        {
+            var heroPowers = await _context.GameStats
+                .GroupBy(s => s.HeroPower)
+                .Select(g => new { HeroPower = g.Key, Count = g.Count() })
+                .OrderByDescending(g => g.Count)
+                .FirstOrDefaultAsync();
+
+            return Ok(heroPowers);
+        }
+
+        // Player stats by Steam name
+        [HttpGet("player-stats/{steamName}")]
+        public async Task<IActionResult> GetPlayerStats(string steamName)
+        {
+            var games = await _context.GameStats
+                .Where(s => s.SteamName == steamName)
+                .ToListAsync();
+
+            if (!games.Any()) return NotFound();
+
+            var winRate = games.Count(g => g.Win) / (double)games.Count;
+            var mostPlayedClass = games.GroupBy(g => g.StartingClass)
+                                       .OrderByDescending(g => g.Count())
+                                       .First().Key;
+
+            return Ok(new
+            {
+                SteamName = steamName,
+                WinRate = winRate,
+                MostPlayedClass = mostPlayedClass
+            });
+        }
     }
 }
