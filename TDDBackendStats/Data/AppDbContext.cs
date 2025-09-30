@@ -12,7 +12,7 @@ namespace CardGameStatsAPI.Data
         }
 
         public DbSet<GameStat> GameStats { get; set; }
-        public DbSet<CardPickStat> CardPickStats { get; set; }
+       // public DbSet<CardPickStat> CardPickStats { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
