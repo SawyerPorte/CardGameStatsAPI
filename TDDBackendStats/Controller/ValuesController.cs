@@ -52,26 +52,29 @@ namespace TDDBackendStats.Controller
         [HttpGet("card-picks")]
         public async Task<IActionResult> GetCardPicks()
         {
-            // Flatten all picked cards into one big list
-            var allCards = await _context.GameStats
-                .SelectMany(s => s.CardsPicked) // assumes CardsPicked is a collection (e.g., List<string>)
+            // Get all CardsPicked lists from DB
+            var allCardLists = await _context.GameStats
+                .Select(s => s.CardsPicked) // List<string>
                 .ToListAsync();
 
-            if (allCards == null || allCards.Count == 0)
-                return Ok(new List<CardPickStat>());
-
-            // Group and count
-            var cardStats = allCards
-                .GroupBy(card => card)
-                .Select(g => new CardPickStat
-                {
-                    CardName = g.Key,
-                    TimesPicked = g.Count()
-                })
-                .OrderByDescending(c => c.TimesPicked)
+            // Flatten into one big list
+            var allCards = allCardLists
+                .Where(list => list != null && list.Count > 0)
+                .SelectMany(list => list) // just flatten the lists
+                .Select(c => c.Trim())    // trim spaces if needed
                 .ToList();
 
-            return Ok(cardStats);
+            if (!allCards.Any())
+                return Ok(new { Card = "", Count = 0 });
+
+            // Group by card and count
+            var mostCommon = allCards
+                .GroupBy(c => c)
+                .Select(g => new { Card = g.Key, Count = g.Count() })
+                .OrderByDescending(g => g.Count)
+                .First();
+
+            return Ok(new { Card = mostCommon.Card, Count = mostCommon.Count });
         }
 
         //// -------------------------
