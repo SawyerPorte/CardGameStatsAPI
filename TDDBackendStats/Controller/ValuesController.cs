@@ -185,6 +185,32 @@ namespace TDDBackendStats.Controller
             var allClasses = allStats.Select(s => s.StartingClass).Where(c => !string.IsNullOrEmpty(c)).ToList();
             var classStats = GroupAndCount(allClasses);
 
+            // Wins by Class
+            var winsByClass = allStats
+                .GroupBy(s => s.StartingClass)
+                .ToDictionary(g => g.Key, g => g.Count(s => s.Win));
+
+            // Average Deck Size
+            var avgDeckSize = allStats.Any() ? allStats.Average(s => s.DeckSize) : 0;
+
+            // Average Run Time (assuming TimePlayed is in seconds as string)
+            double avgRunTimeSeconds = 0;
+            var times = allStats
+                .Select(s => double.TryParse(s.TimePlayed, out var t) ? t : (double?)null)
+                .Where(t => t.HasValue)
+                .Select(t => t.Value)
+                .ToList();
+            if (times.Any())
+                avgRunTimeSeconds = times.Average();
+            // format as mm:ss
+            string avgRunTime = TimeSpan.FromSeconds(avgRunTimeSeconds).ToString(@"mm\:ss");
+
+            // Highest Score
+            var highestScoreEntry = allStats
+                .OrderByDescending(s => s.EndingScore)
+                .Select(s => new { s.SteamName, s.EndingScore })
+                .FirstOrDefault();
+
             return Ok(new
             {
                 cards = cardStats,
@@ -192,7 +218,17 @@ namespace TDDBackendStats.Controller
                 charms = charmStats,
                 heroPowers = heroPowerStats,
                 enemies = enemyStats,
-                classes = classStats
+                classes = classStats,
+                topClass = classStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
+                winsByClass = winsByClass,
+                avgDeckSize = avgDeckSize,
+                mostDeadlyEnemy = enemyStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
+                topRelic = relicStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
+                topCharm = charmStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
+                topCard = cardStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
+                topHeroPower = heroPowerStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
+                avgRunTime = avgRunTime,
+                highestScore = highestScoreEntry ?? new { SteamName = "NEED DATA", EndingScore = 0 }
             });
         }
     }
