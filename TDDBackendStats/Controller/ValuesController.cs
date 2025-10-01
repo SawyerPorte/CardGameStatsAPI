@@ -229,6 +229,32 @@ namespace TDDBackendStats.Controller
                 .Select(s => new { s.SteamName, s.EndingScore })
                 .FirstOrDefault();
 
+
+            // Wins / Attempts by Class
+            var winRateByClass = allStats
+                .GroupBy(s => s.StartingClass)
+                .Select(g => new
+                {
+                    Class = g.Key,
+                    Wins = g.Count(s => s.Win),
+                    Attempts = g.Count(),
+                    WinRate = g.Count() > 0 ? (double)g.Count(s => s.Win) / g.Count() * 100 : 0
+                })
+                .ToList();
+
+            // Wins / Attempts by Difficulty
+            var winRateByDifficulty = allStats
+                .GroupBy(s => s.DifficultyLevel) // assuming you have DifficultyLevel in your GameStats model
+                .Select(g => new
+                {
+                    Difficulty = g.Key,
+                    Wins = g.Count(s => s.Win),
+                    Attempts = g.Count(),
+                    WinRate = g.Count() > 0 ? (double)g.Count(s => s.Win) / g.Count() * 100 : 0
+                })
+                .OrderBy(x => x.Difficulty)
+                .ToList();
+
             return Ok(new
             {
                 cards = cardStats,
@@ -246,7 +272,9 @@ namespace TDDBackendStats.Controller
                 topCard = cardStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
                 topHeroPower = heroPowerStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
                 avgRunTime = avgRunTime,
-                highestScore = highestScoreEntry ?? new { SteamName = "NEED DATA", EndingScore = 0 }
+                highestScore = highestScoreEntry ?? new { SteamName = "NEED DATA", EndingScore = 0 },
+                winRateByClass = winRateByClass,
+                winRateByDifficulty = winRateByDifficulty
             });
         }
     }
