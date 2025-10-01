@@ -231,29 +231,34 @@ namespace TDDBackendStats.Controller
 
 
             // Wins / Attempts by Class
-            var winRateByClass = allStats
-                .GroupBy(s => s.StartingClass)
-                .Select(g => new
-                {
-                    Class = g.Key,
-                    Wins = g.Count(s => s.Win),
-                    Attempts = g.Count(),
-                    WinRate = g.Count() > 0 ? (double)g.Count(s => s.Win) / g.Count() * 100 : 0
-                })
-                .ToList();
+            string[] possibleClasses = new[] { "Reaper", "Warlock", "Gambler", "Vampire" };
+            int[] allDifficulties = Enumerable.Range(0, 20).ToArray();
 
-            // Wins / Attempts by Difficulty
-            var winRateByDifficulty = allStats
-                .GroupBy(s => s.DifficultyLevel) // assuming you have DifficultyLevel in your GameStats model
-                .Select(g => new
+            // Fill in WinRateByClass with 0 for missing
+            var winRateByClass = allClasses.Select(cls =>
+            {
+                var entry = allStats.Where(s => s.StartingClass == cls).ToList();
+                var wins = entry.Count(s => s.Win);
+                var attempts = entry.Count;
+                return new
                 {
-                    Difficulty = g.Key,
-                    Wins = g.Count(s => s.Win),
-                    Attempts = g.Count(),
-                    WinRate = g.Count() > 0 ? (double)g.Count(s => s.Win) / g.Count() * 100 : 0
-                })
-                .OrderBy(x => x.Difficulty)
-                .ToList();
+                    Class = cls,
+                    WinRate = attempts > 0 ? (double)wins / attempts * 100 : 0
+                };
+            }).ToList();
+
+            // Fill in WinRateByDifficulty with 0 for missing
+            var winRateByDifficulty = allDifficulties.Select(d =>
+            {
+                var entry = allStats.Where(s => s.DifficultyLevel == d).ToList();
+                var wins = entry.Count(s => s.Win);
+                var attempts = entry.Count;
+                return new
+                {
+                    Difficulty = d,
+                    WinRate = attempts > 0 ? (double)wins / attempts * 100 : 0
+                };
+            }).ToList();
 
             return Ok(new
             {
