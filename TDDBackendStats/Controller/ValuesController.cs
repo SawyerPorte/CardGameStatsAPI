@@ -151,14 +151,15 @@ namespace TDDBackendStats.Controller
                 return Ok(new { }); // no data
 
             // Helper to group and count a list of strings
-            List<object> GroupAndCount(IEnumerable<string> items)
+            List<object> GroupAndCount(IEnumerable<string> items, int topN = 3)
             {
                 return items
-                    .Where(s => !string.IsNullOrEmpty(s))
-                    .GroupBy(x => x)
-                    .Select(g => new { Name = g.Key, Count = g.Count() })
-                    .OrderByDescending(g => g.Count)
-                    .ToList<object>();
+                .Where(s => !string.IsNullOrEmpty(s))
+                .GroupBy(x => x)
+                .Select(g => new { Name = g.Key, Count = g.Count() })
+                .OrderByDescending(g => g.Count)
+                .Take(topN)
+                .ToList<object>();
             }
 
             // Cards
