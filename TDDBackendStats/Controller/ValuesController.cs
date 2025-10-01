@@ -235,15 +235,21 @@ namespace TDDBackendStats.Controller
             int[] allDifficulties = Enumerable.Range(0, 20).ToArray();
 
             // Fill in WinRateByClass with 0 for missing
-            var winRateByClass = allClasses.Select(cls =>
+            var winRateByClass = possibleClasses.Select(cls =>
             {
-                var entry = allStats.Where(s => s.StartingClass == cls).ToList();
-                var wins = entry.Count(s => s.Win);
-                var attempts = entry.Count;
+                // Find all entries matching this class (normalize casing)
+                var entries = allStats
+                    .Where(s => !string.IsNullOrEmpty(s.StartingClass) &&
+                                s.StartingClass.Trim().Equals(cls, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                var wins = entries.Count(s => s.Win);
+                var total = entries.Count;
+
                 return new
                 {
                     Class = cls,
-                    WinRate = attempts > 0 ? (double)wins / attempts * 100 : 0
+                    WinRate = total > 0 ? (double)wins / total * 100 : 0
                 };
             }).ToList();
 
