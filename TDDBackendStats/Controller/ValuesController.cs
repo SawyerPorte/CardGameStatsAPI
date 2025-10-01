@@ -179,7 +179,14 @@ namespace TDDBackendStats.Controller
             var heroPowerStats = GroupAndCount(allHeroPowers);
 
             // Enemies
-            var allEnemies = allStats.Select(s => s.EnemyThatKilled).Where(e => !string.IsNullOrEmpty(e)).ToList();
+            // Enemies (split on commas)
+            var allEnemies = allStats
+                .SelectMany(s => s.EnemyThatKilled?
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
+                .Select(e => e.Trim()) // remove extra spaces
+                .Where(e => !string.IsNullOrEmpty(e))
+                .ToList();
+
             var enemyStats = GroupAndCount(allEnemies);
 
             // Classes
