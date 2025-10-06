@@ -220,7 +220,10 @@ namespace TDDBackendStats.Controller
                 avgRunTime = new TimeSpan(totalTicks / timeSpans.Count);
             }
 
+            // Round total seconds
             var avgRunTimeRounded = TimeSpan.FromSeconds(Math.Round(avgRunTime.TotalSeconds));
+
+            // Format as HH:mm:ss
             string avgRunTimeStr = avgRunTimeRounded.ToString(@"hh\:mm\:ss");
 
             // Highest Score
