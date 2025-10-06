@@ -199,7 +199,7 @@ namespace TDDBackendStats.Controller
                 .ToDictionary(g => g.Key, g => g.Count(s => s.Win));
 
             // Average Deck Size
-            var avgDeckSize = allStats.Any() ? allStats.Average(s => s.DeckSize) : 0;
+            var avgDeckSize = allStats.Any() ? (int)Math.Round(allStats.Average(s => s.DeckSize)) : 0;
 
             // Average Run Time (assuming TimePlayed is in seconds as string)
             var timeSpans = allStats
@@ -220,8 +220,13 @@ namespace TDDBackendStats.Controller
                 avgRunTime = new TimeSpan(totalTicks / timeSpans.Count);
             }
 
+            TimeSpan avgRunTimeRounded = new TimeSpan(
+                avgRunTime.Hours,
+                avgRunTime.Minutes,
+                (int)Math.Round(avgRunTime.Seconds + avgRunTime.Milliseconds / 1000.0)
+);
             // Format as string (HH:mm:ss)
-            string avgRunTimeStr = avgRunTime.ToString(@"hh\:mm\:ss");
+            string avgRunTimeStr = avgRunTimeRounded.ToString(@"hh\:mm\:ss");
 
             // Highest Score
             var highestScoreEntry = allStats
@@ -249,7 +254,7 @@ namespace TDDBackendStats.Controller
                 return new
                 {
                     Class = cls,
-                    WinRate = total > 0 ? (double)wins / total * 100 : 0
+                    WinRate = total > 0 ? Math.Round((double)wins / total * 100, 1) : 0
                 };
             }).ToList();
 
@@ -262,7 +267,7 @@ namespace TDDBackendStats.Controller
                 return new
                 {
                     Difficulty = d,
-                    WinRate = attempts > 0 ? (double)wins / attempts * 100 : 0
+                    WinRate = attempts > 0 ? Math.Round((double)wins / attempts * 100, 1) : 0
                 };
             }).ToList();
 
