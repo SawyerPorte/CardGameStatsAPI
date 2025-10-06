@@ -225,6 +225,7 @@ namespace TDDBackendStats.Controller
 
             // Format as HH:mm:ss
             string avgRunTimeStr = avgRunTimeRounded.ToString(@"hh\:mm\:ss");
+            avgRunTimeStr = avgRunTimeStr.Substring(0, 8);
 
             // Highest Score
             var highestScoreEntry = allStats
@@ -285,7 +286,7 @@ namespace TDDBackendStats.Controller
                 topCharm = charmStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
                 topCard = cardStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
                 topHeroPower = heroPowerStats.FirstOrDefault() ?? new { Name = "NEED DATA", Count = 0 },
-                avgRunTime = avgRunTime,
+                avgRunTime = avgRunTimeRounded,
                 highestScore = highestScoreEntry ?? new { SteamName = "NEED DATA", EndingScore = 0 },
                 winRateByClass = winRateByClass,
                 winRateByDifficulty = winRateByDifficulty
